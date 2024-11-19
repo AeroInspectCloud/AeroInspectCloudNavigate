@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Navigation App</title>
+    <title>Turn-by-Turn Navigation</title>
     <!-- Mapbox CSS -->
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
     <style>
@@ -20,61 +20,50 @@
             bottom: 0;
             width: 100%;
         }
-        .nav-dashboard {
+        .dashboard {
             position: absolute;
-            bottom: 0;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+        .dashboard select {
             width: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 10px 15px;
-            font-size: 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 2;
-        }
-        .nav-dashboard div {
-            flex: 1;
-            text-align: center;
-        }
-        .nav-dashboard select, .nav-dashboard button {
             padding: 10px;
+            margin-bottom: 10px;
             font-size: 14px;
-            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            outline: none;
         }
-        .marker {
-            width: 20px;
-            height: 20px;
-            background-color: red;
-            border-radius: 50%;
-            border: 2px solid white;
+        .instructions {
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .instructions p {
+            margin: 0;
+            padding: 5px 0;
         }
     </style>
 </head>
 <body>
     <div id="map"></div>
-    <div class="nav-dashboard">
-        <div>
-            <select id="route-selector">
-                <option value="">Wähle eine Route</option>
-                <option value="route1">Stadtzentrum</option>
-                <option value="route2">Parkrunde</option>
-                <option value="route3">Küstenlinie</option>
-                <option value="route4">Bergfahrt</option>
-                <option value="route5">Ländliche Strecke</option>
-            </select>
-        </div>
-        <div>
-            <button id="start-navigation">Start</button>
-        </div>
-        <div>
-            <strong>Distanz:</strong>
-            <span id="distance">0 km</span>
-        </div>
-        <div>
-            <strong>Dauer:</strong>
-            <span id="duration">0 Minuten</span>
-        </div>
+    <div class="dashboard">
+        <h3>Turn-by-Turn Navigation</h3>
+        <select id="route-selector">
+            <option value="">-- Wähle eine Route --</option>
+            <option value="route1">Route 1: Stadtzentrum</option>
+            <option value="route2">Route 2: Küstenlinie</option>
+            <option value="route3">Route 3: Bergtour</option>
+        </select>
+        <div class="instructions" id="instructions">Wähle eine Route, um Anweisungen zu sehen.</div>
     </div>
 
     <!-- Mapbox JS -->
@@ -86,78 +75,83 @@
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v11',
             center: [10.0, 50.0],
-            zoom: 10
+            zoom: 6
         });
 
-        const routes = {
-            route1: [[10.0, 50.0], [10.1, 50.1], [10.2, 50.0]],
-            route2: [[10.5, 50.0], [10.6, 50.1], [10.7, 50.0]],
-            route3: [[9.5, 53.0], [9.6, 53.1], [9.7, 53.0]],
-            route4: [[11.5, 47.0], [11.6, 47.1], [11.7, 47.0]],
-            route5: [[9.0, 48.0], [9.1, 48.1], [9.2, 48.0]]
+        const routeData = {
+            route1: [
+                [10.0, 50.0], [10.1, 50.1], [10.2, 50.0], [10.3, 50.1], [10.4, 50.0],
+                [10.5, 50.1], [10.6, 50.0], [10.7, 50.1], [10.8, 50.0], [10.9, 50.1],
+                [11.0, 50.0], [11.1, 50.1]
+            ],
+            route2: [
+                [8.5, 53.0], [8.6, 53.1], [8.7, 53.0], [8.8, 53.1], [8.9, 53.0],
+                [9.0, 53.1], [9.1, 53.0], [9.2, 53.1], [9.3, 53.0], [9.4, 53.1],
+                [9.5, 53.0], [9.6, 53.1]
+            ],
+            route3: [
+                [11.5, 47.0], [11.6, 47.1], [11.7, 47.0], [11.8, 47.1], [11.9, 47.0],
+                [12.0, 47.1], [12.1, 47.0], [12.2, 47.1], [12.3, 47.0], [12.4, 47.1],
+                [12.5, 47.0], [12.6, 47.1]
+            ]
         };
 
+        const instructions = document.getElementById('instructions');
         const routeSelector = document.getElementById('route-selector');
-        const startButton = document.getElementById('start-navigation');
-        const distanceElement = document.getElementById('distance');
-        const durationElement = document.getElementById('duration');
 
-        let selectedRoute = null;
-
-        routeSelector.addEventListener('change', () => {
-            const routeKey = routeSelector.value;
-            selectedRoute = routes[routeKey];
+        routeSelector.addEventListener('change', async () => {
+            const selectedRoute = routeData[routeSelector.value];
             if (selectedRoute) {
-                drawRoute(selectedRoute);
+                await drawRoute(selectedRoute);
+            } else {
+                instructions.innerHTML = 'Wähle eine gültige Route aus.';
             }
         });
 
-        function drawRoute(coordinates) {
-            const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates.map(coord => coord.join(',')).join(';')}?geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`;
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.routes || !data.routes[0]) {
-                        alert('Keine Route gefunden!');
-                        return;
-                    }
+        async function drawRoute(coordinates) {
+            const query = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates.map(c => c.join(',')).join(';')}?steps=true&geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`;
+            const response = await fetch(query);
+            const data = await response.json();
 
-                    const routeData = data.routes[0];
-                    const geojson = {
-                        type: 'Feature',
-                        geometry: routeData.geometry
-                    };
-
-                    if (map.getSource('route')) {
-                        map.getSource('route').setData(geojson);
-                    } else {
-                        map.addSource('route', { type: 'geojson', data: geojson });
-                        map.addLayer({
-                            id: 'route',
-                            type: 'line',
-                            source: 'route',
-                            layout: { 'line-join': 'round', 'line-cap': 'round' },
-                            paint: { 'line-color': '#007cbf', 'line-width': 5 }
-                        });
-                    }
-
-                    distanceElement.textContent = `${(routeData.distance / 1000).toFixed(2)} km`;
-                    durationElement.textContent = `${Math.round(routeData.duration / 60)} Minuten`;
-
-                    // Kamera anpassen
-                    const bounds = new mapboxgl.LngLatBounds();
-                    routeData.geometry.coordinates.forEach(coord => bounds.extend(coord));
-                    map.fitBounds(bounds, { padding: 50 });
-                });
-        }
-
-        startButton.addEventListener('click', () => {
-            if (!selectedRoute) {
-                alert('Bitte wähle eine Route!');
+            if (!data.routes || !data.routes[0]) {
+                instructions.innerHTML = 'Keine Route gefunden.';
                 return;
             }
-            alert('Navigation gestartet! Folge der blauen Linie auf der Karte.');
-        });
+
+            const route = data.routes[0];
+            const steps = route.legs[0].steps;
+
+            // Route anzeigen
+            const routeGeoJSON = {
+                type: 'Feature',
+                geometry: route.geometry
+            };
+
+            if (map.getSource('route')) {
+                map.getSource('route').setData(routeGeoJSON);
+            } else {
+                map.addSource('route', { type: 'geojson', data: routeGeoJSON });
+                map.addLayer({
+                    id: 'route',
+                    type: 'line',
+                    source: 'route',
+                    layout: { 'line-join': 'round', 'line-cap': 'round' },
+                    paint: { 'line-color': '#007cbf', 'line-width': 5 }
+                });
+            }
+
+            // Turn-by-Turn-Anweisungen anzeigen
+            displayInstructions(steps);
+        }
+
+        function displayInstructions(steps) {
+            instructions.innerHTML = '';
+            steps.forEach((step, index) => {
+                const instruction = document.createElement('p');
+                instruction.textContent = `${index + 1}. ${step.maneuver.instruction}`;
+                instructions.appendChild(instruction);
+            });
+        }
     </script>
 </body>
 </html>
