@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AERO INSPECT - MAP</title>
+    <!-- Mapbox CSS -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <!-- Mapbox Geocoder CSS -->
+    <link href="https://api.mapbox.com/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+        .info-box {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 10px;
+            padding: 10px;
+            max-width: 200px;
+        }
+        .floating-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: black;
+            color: white;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .floating-button:hover {
+            background-color: white;
+            color: black;
+        }
+        .route-details-popup {
+            display: none;
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -20%);
+            width: 400px;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .route-details-popup button {
+            width: 100%;
+            padding: 10px;
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .route-details-popup button:hover {
+            background-color: white;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="info-box">
+        <h3>Routen-Details</h3>
+        <p id="route-customers">Kunden: 0</p>
+        <p id="route-distance">Distanz: 0 km</p>
+        <p id="route-time">Zeit: 0 Minuten</p>
+    </div>
+    <div class="floating-button" id="show-route-button">Route anzeigen</div>
+    <div class="route-details-popup" id="route-popup">
+        <h3>ROUTEN-DETAILS</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Kunde</th>
+                    <th>Ort</th>
+                    <th>Aufenthalt</th>
+                </tr>
+            </thead>
+            <tbody id="route-table-body"></tbody>
+        </table>
+        <button id="close-popup">Schließen</button>
+    </div>
+    <!-- Mapbox JS -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <!-- Mapbox Geocoder JS -->
+    <script src="https://api.mapbox.com/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYWVyb2luc3BlY3QiLCJhIjoiY20zZDI5ZW1rMjV2dzJqc2U2cHZ0Y2I5ciJ9.ocXZqAz8Uyz0nkPD6ILZ5A';
+
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [10.0, 50.0],
+            zoom: 5
+        });
+
+        const customerData = [];
+        const selectedCustomers = [];
+        const selectedPoints = [];
+        let startPoint = null;
+
+        // Generierung der Kundenkoordinaten
+        for (let i = 0; i < 20; i++) {
+            customerData.push({
+                id: i + 1,
+                name: `Kunde ${i + 1}`,
+                coordinates: [
+                    10 + (Math.random() - 0.5) * 5, 
+                    50 + (Math.random() - 0.5) * 5
+                ],
+                visitDuration: 10
+            });
+        }
+
+        const bounds = new mapboxgl.LngLatBounds();
+
+        customerData.forEach(customer => {
+            const marker = new mapboxgl.Marker()
+                .setLngLat(customer.coordinates)
+                .setPopup(new mapboxgl.Popup().setText(customer.name))
+                .addTo(map);
+            bounds.extend(customer.coordinates);
+        });
+
+        map.fitBounds(bounds, { padding: 50 });
+
+        document.getElementById('show-route-button').addEventListener('click', () => {
+            const popup = document.getElementById('route-popup');
+            const tableBody = document.getElementById('route-table-body');
+            tableBody.innerHTML = selectedCustomers
+                .map(
+                    (customer, index) => `
+                <tr>
+                    <td>${index + 1}. ${customer.name}</td>
+                    <td>${customer.coordinates.join(', ')}</td>
+                    <td>${customer.visitDuration} Minuten</td>
+                </tr>
+            `
+                )
+                .join('');
+            popup.style.display = 'block';
+        });
+
+        document.getElementById('close-popup').addEventListener('click', () => {
+            document.getElementById('route-popup').style.display = 'none';
+        });
+
+        const geocoder = new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            mapboxgl: mapboxgl,
+            placeholder: 'Startpunkt wählen...',
+        });
+
+        geocoder.on('result', (e) => {
+            startPoint = e.result.geometry.coordinates;
+        });
+
+        map.addControl(geocoder);
+    </script>
+</body>
+</html>
