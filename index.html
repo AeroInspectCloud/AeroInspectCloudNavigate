@@ -3,163 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Document Library</title>
+    <title>Planned Routes</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-        }
-    </style>
 </head>
 <body class="bg-gray-900 text-gray-100">
     <!-- Header -->
     <header class="bg-gray-800 py-6 shadow-lg">
         <div class="container mx-auto flex justify-between items-center px-6">
-            <h1 class="text-3xl font-bold tracking-wide">Document Library</h1>
-            <div>
-                <button id="loginBtn" class="bg-gray-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-600 transition">
-                    Login
-                </button>
-                <button id="logoutBtn" class="bg-red-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-600 transition hidden">
-                    Logout
-                </button>
-            </div>
+            <h1 class="text-3xl font-bold tracking-wide">Planned Routes</h1>
         </div>
     </header>
 
-    <!-- Main Section -->
+    <!-- Main Content -->
     <main class="container mx-auto px-6 py-8">
-        <!-- Status Message -->
-        <div id="status" class="text-center text-gray-400 text-lg mb-8">Please login to view the documents.</div>
-
-        <!-- Breadcrumb Navigation -->
-        <nav id="breadcrumb" class="flex items-center space-x-4 mb-6 text-gray-300 hidden">
-            <span class="text-gray-500">You are here:</span>
-            <div id="breadcrumb-links" class="flex space-x-2"></div>
-        </nav>
-
-        <!-- Document Table -->
-        <table id="documentsTable" class="table-auto w-full bg-gray-800 shadow-lg rounded-lg hidden">
+        <!-- Routes Table -->
+        <table class="table-auto w-full bg-gray-800 shadow-lg rounded-lg">
             <thead>
                 <tr class="bg-gray-700 text-gray-100">
-                    <th class="px-4 py-3 text-left">Name</th>
-                    <th class="px-4 py-3 text-left">Type</th>
-                    <th class="px-4 py-3 text-left">Modified By</th>
-                    <th class="px-4 py-3 text-left">Last Modified</th>
+                    <th class="px-4 py-3 text-left">Status</th>
+                    <th class="px-4 py-3 text-left">Route Name</th>
+                    <th class="px-4 py-3 text-left">Planned Date</th>
+                    <th class="px-4 py-3 text-left">Duration (hrs)</th>
+                    <th class="px-4 py-3 text-left">Distance (km)</th>
+                    <th class="px-4 py-3 text-left">Customer Status</th>
+                    <th class="px-4 py-3 text-left"></th>
                 </tr>
             </thead>
-            <tbody class="text-gray-300"></tbody>
+            <tbody class="text-gray-300" id="routeTable">
+                <!-- Dynamic Data Rows -->
+            </tbody>
         </table>
     </main>
 
+    <!-- Modal for Route Details -->
+    <div id="routeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 text-gray-100 rounded-lg shadow-lg w-2/3 p-6">
+            <h2 class="text-2xl font-bold mb-4" id="modalRouteName">Route Details</h2>
+            <table class="table-auto w-full bg-gray-700 shadow-lg rounded-lg">
+                <thead>
+                    <tr class="bg-gray-600">
+                        <th class="px-4 py-3 text-left">Customer Name</th>
+                        <th class="px-4 py-3 text-left">Address</th>
+                        <th class="px-4 py-3 text-left">Contact</th>
+                        <th class="px-4 py-3 text-left">Status</th>
+                        <th class="px-4 py-3 text-left"></th>
+                    </tr>
+                </thead>
+                <tbody id="customerTable">
+                    <!-- Dynamic Customer Rows -->
+                </tbody>
+            </table>
+            <div class="flex justify-end mt-4">
+                <button class="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-500" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Mock Data for Testing
-        const mockData = [
+        // Example Data for Routes
+        const routes = [
             {
-                name: "Folder 1",
-                type: "folder",
-                children: [
-                    { name: "Document1.pdf", type: "file", modifiedBy: "John Doe", modifiedDate: new Date().toISOString() },
-                    { name: "Document2.docx", type: "file", modifiedBy: "Jane Smith", modifiedDate: new Date().toISOString() },
+                id: 1,
+                status: "green",
+                name: "Route A",
+                plannedDate: "2024-12-01",
+                duration: 4,
+                distance: 120,
+                customerStatus: "All Terminated",
+                customers: [
+                    { name: "John Doe", address: "123 Main St", contact: "123-456-7890", status: "Planned" },
+                    { name: "Jane Smith", address: "456 Elm St", contact: "987-654-3210", status: "Planned" },
                 ],
             },
             {
-                name: "Folder 2",
-                type: "folder",
-                children: [
-                    { name: "Spreadsheet.xlsx", type: "file", modifiedBy: "Emily Johnson", modifiedDate: new Date().toISOString() },
+                id: 2,
+                status: "yellow",
+                name: "Route B",
+                plannedDate: "2024-12-02",
+                duration: 6,
+                distance: 180,
+                customerStatus: "Partially Terminated",
+                customers: [
+                    { name: "Emily Johnson", address: "789 Pine St", contact: "555-123-4567", status: "Planned" },
+                    { name: "Michael Brown", address: "321 Oak St", contact: "555-987-6543", status: "Done" },
                 ],
             },
             {
-                name: "Presentation.pptx",
-                type: "file",
-                modifiedBy: "Michael Brown",
-                modifiedDate: new Date().toISOString(),
+                id: 3,
+                status: "red",
+                name: "Route C",
+                plannedDate: "2024-12-03",
+                duration: 3,
+                distance: 90,
+                customerStatus: "Not Terminated",
+                customers: [
+                    { name: "Alice Green", address: "101 Maple St", contact: "555-222-3333", status: "Planned" },
+                ],
             },
         ];
 
-        let currentFolder = mockData; // Track the current folder contents
-        const breadcrumb = []; // Track navigation path
+        // Load Routes into the Table
+        function loadRoutes() {
+            const table = document.getElementById("routeTable");
+            table.innerHTML = ""; // Clear table
 
-        function updateBreadcrumb() {
-            const breadcrumbLinks = document.getElementById("breadcrumb-links");
-            breadcrumbLinks.innerHTML = "";
-            breadcrumb.forEach((crumb, index) => {
-                const link = document.createElement("button");
-                link.className = "text-blue-400 hover:underline";
-                link.textContent = crumb.name;
-                link.onclick = () => navigateTo(index);
-                breadcrumbLinks.appendChild(link);
-                if (index < breadcrumb.length - 1) {
-                    const separator = document.createElement("span");
-                    separator.textContent = " / ";
-                    breadcrumbLinks.appendChild(separator);
-                }
-            });
-        }
-
-        function navigateTo(index) {
-            if (index < 0) {
-                currentFolder = mockData;
-                breadcrumb.length = 0;
-            } else {
-                currentFolder = breadcrumb[index].children;
-                breadcrumb.length = index + 1;
-            }
-            displayDocuments();
-        }
-
-        function displayDocuments() {
-            const table = document.getElementById("documentsTable");
-            const tbody = table.querySelector("tbody");
-            const breadcrumbNav = document.getElementById("breadcrumb");
-
-            tbody.innerHTML = ""; // Clear previous data
-            breadcrumbNav.classList.remove("hidden");
-            table.classList.remove("hidden");
-
-            updateBreadcrumb();
-
-            currentFolder.forEach((item) => {
+            routes.forEach(route => {
                 const row = document.createElement("tr");
                 row.className = "border-b border-gray-700 hover:bg-gray-700 transition";
 
-                if (item.type === "folder") {
-                    row.innerHTML = `
-                        <td class="px-4 py-3">
-                            <button class="text-blue-400 hover:underline" onclick="openFolder('${item.name}')">${item.name}</button>
-                        </td>
-                        <td class="px-4 py-3">Folder</td>
-                        <td class="px-4 py-3">-</td>
-                        <td class="px-4 py-3">-</td>
-                    `;
-                } else {
-                    row.innerHTML = `
-                        <td class="px-4 py-3">
-                            <a href="#" class="text-blue-400 hover:underline">${item.name}</a>
-                        </td>
-                        <td class="px-4 py-3">File</td>
-                        <td class="px-4 py-3">${item.modifiedBy || "Unknown"}</td>
-                        <td class="px-4 py-3">${new Date(item.modifiedDate).toLocaleDateString()}</td>
-                    `;
-                }
-                tbody.appendChild(row);
+                row.innerHTML = `
+                    <td class="px-4 py-3">
+                        <span class="w-4 h-4 inline-block rounded-full" style="background-color: ${route.status};"></span>
+                    </td>
+                    <td class="px-4 py-3">${route.name}</td>
+                    <td class="px-4 py-3">${route.plannedDate}</td>
+                    <td class="px-4 py-3">${route.duration}</td>
+                    <td class="px-4 py-3">${route.distance}</td>
+                    <td class="px-4 py-3">${route.customerStatus}</td>
+                    <td class="px-4 py-3">
+                        <button class="bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-500 transition" onclick="openModal(${route.id})">
+                            Start
+                        </button>
+                    </td>
+                `;
+                table.appendChild(row);
             });
         }
 
-        function openFolder(folderName) {
-            const folder = currentFolder.find((item) => item.name === folderName && item.type === "folder");
-            if (folder) {
-                breadcrumb.push(folder);
-                currentFolder = folder.children;
-                displayDocuments();
+        // Open Modal for Route Details
+        function openModal(routeId) {
+            const route = routes.find(r => r.id === routeId);
+            if (!route) return;
+
+            // Update Modal Content
+            document.getElementById("modalRouteName").textContent = route.name;
+            const customerTable = document.getElementById("customerTable");
+            customerTable.innerHTML = ""; // Clear table
+
+            route.customers.forEach(customer => {
+                const row = document.createElement("tr");
+                row.className = "border-b border-gray-600 hover:bg-gray-600 transition";
+
+                row.innerHTML = `
+                    <td class="px-4 py-3">${customer.name}</td>
+                    <td class="px-4 py-3">${customer.address}</td>
+                    <td class="px-4 py-3">${customer.contact}</td>
+                    <td class="px-4 py-3">${customer.status}</td>
+                    <td class="px-4 py-3">
+                        <button class="bg-green-600 px-4 py-2 rounded-lg hover:bg-green-500 transition" onclick="markDone('${customer.name}', ${routeId})">
+                            Mark Done
+                        </button>
+                    </td>
+                `;
+                customerTable.appendChild(row);
+            });
+
+            // Show Modal
+            document.getElementById("routeModal").classList.remove("hidden");
+        }
+
+        // Mark Customer as Done
+        function markDone(customerName, routeId) {
+            const route = routes.find(r => r.id === routeId);
+            if (!route) return;
+
+            const customer = route.customers.find(c => c.name === customerName);
+            if (customer) {
+                customer.status = "Done";
+                openModal(routeId); // Refresh modal
             }
         }
 
-        // Populate mock data on load for testing
-        document.addEventListener("DOMContentLoaded", () => {
-            navigateTo(-1); // Load root directory
-        });
+        // Close Modal
+        function closeModal() {
+            document.getElementById("routeModal").classList.add("hidden");
+        }
+
+        // Initialize
+        document.addEventListener("DOMContentLoaded", loadRoutes);
     </script>
 </body>
 </html>
