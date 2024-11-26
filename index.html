@@ -3,184 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planned Routes</title>
+    <title>Dark Mode List</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-gray-100">
+<body class="bg-gray-900 text-gray-100 font-sans">
     <!-- Header -->
-    <header class="bg-gray-800 py-6 shadow-lg">
-        <div class="container mx-auto flex justify-between items-center px-6">
-            <h1 class="text-3xl font-bold tracking-wide">Planned Routes</h1>
+    <header class="bg-gray-800 shadow-md py-4">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Simple Dark List</h1>
         </div>
     </header>
 
     <!-- Main Content -->
     <main class="container mx-auto px-6 py-8">
-        <!-- Routes Table -->
-        <table class="table-auto w-full bg-gray-800 shadow-lg rounded-lg">
-            <thead>
-                <tr class="bg-gray-700 text-gray-100">
+        <!-- List Table -->
+        <table class="table-auto w-full bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+            <thead class="bg-gray-700 text-gray-100">
+                <tr>
                     <th class="px-4 py-3 text-left">Status</th>
-                    <th class="px-4 py-3 text-left">Route Name</th>
-                    <th class="px-4 py-3 text-left">Planned Date</th>
-                    <th class="px-4 py-3 text-left">Duration (hrs)</th>
-                    <th class="px-4 py-3 text-left">Distance (km)</th>
-                    <th class="px-4 py-3 text-left">Customer Status</th>
-                    <th class="px-4 py-3 text-left"></th>
+                    <th class="px-4 py-3 text-left">Item Name</th>
+                    <th class="px-4 py-3 text-left">Category</th>
+                    <th class="px-4 py-3 text-left">Date</th>
                 </tr>
             </thead>
-            <tbody class="text-gray-300" id="routeTable">
-                <!-- Dynamic Data Rows -->
+            <tbody class="text-gray-300">
+                <!-- Example Row 1 -->
+                <tr class="border-b border-gray-700 hover:bg-gray-700 transition">
+                    <td class="px-4 py-3">
+                        <span class="w-4 h-4 inline-block bg-green-500 rounded-full"></span>
+                    </td>
+                    <td class="px-4 py-3">Item A</td>
+                    <td class="px-4 py-3">Category 1</td>
+                    <td class="px-4 py-3">2024-12-01</td>
+                </tr>
+                <!-- Example Row 2 -->
+                <tr class="border-b border-gray-700 hover:bg-gray-700 transition">
+                    <td class="px-4 py-3">
+                        <span class="w-4 h-4 inline-block bg-yellow-500 rounded-full"></span>
+                    </td>
+                    <td class="px-4 py-3">Item B</td>
+                    <td class="px-4 py-3">Category 2</td>
+                    <td class="px-4 py-3">2024-12-02</td>
+                </tr>
+                <!-- Example Row 3 -->
+                <tr class="border-b border-gray-700 hover:bg-gray-700 transition">
+                    <td class="px-4 py-3">
+                        <span class="w-4 h-4 inline-block bg-red-500 rounded-full"></span>
+                    </td>
+                    <td class="px-4 py-3">Item C</td>
+                    <td class="px-4 py-3">Category 3</td>
+                    <td class="px-4 py-3">2024-12-03</td>
+                </tr>
             </tbody>
         </table>
     </main>
-
-    <!-- Modal for Route Details -->
-    <div id="routeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
-        <div class="bg-gray-800 text-gray-100 rounded-lg shadow-lg w-2/3 p-6">
-            <h2 class="text-2xl font-bold mb-4" id="modalRouteName">Route Details</h2>
-            <table class="table-auto w-full bg-gray-700 shadow-lg rounded-lg">
-                <thead>
-                    <tr class="bg-gray-600">
-                        <th class="px-4 py-3 text-left">Customer Name</th>
-                        <th class="px-4 py-3 text-left">Address</th>
-                        <th class="px-4 py-3 text-left">Contact</th>
-                        <th class="px-4 py-3 text-left">Status</th>
-                        <th class="px-4 py-3 text-left"></th>
-                    </tr>
-                </thead>
-                <tbody id="customerTable">
-                    <!-- Dynamic Customer Rows -->
-                </tbody>
-            </table>
-            <div class="flex justify-end mt-4">
-                <button class="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-500" onclick="closeModal()">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Example Data for Routes
-        const routes = [
-            {
-                id: 1,
-                status: "green",
-                name: "Route A",
-                plannedDate: "2024-12-01",
-                duration: 4,
-                distance: 120,
-                customerStatus: "All Terminated",
-                customers: [
-                    { name: "John Doe", address: "123 Main St", contact: "123-456-7890", status: "Planned" },
-                    { name: "Jane Smith", address: "456 Elm St", contact: "987-654-3210", status: "Planned" },
-                ],
-            },
-            {
-                id: 2,
-                status: "yellow",
-                name: "Route B",
-                plannedDate: "2024-12-02",
-                duration: 6,
-                distance: 180,
-                customerStatus: "Partially Terminated",
-                customers: [
-                    { name: "Emily Johnson", address: "789 Pine St", contact: "555-123-4567", status: "Planned" },
-                    { name: "Michael Brown", address: "321 Oak St", contact: "555-987-6543", status: "Done" },
-                ],
-            },
-            {
-                id: 3,
-                status: "red",
-                name: "Route C",
-                plannedDate: "2024-12-03",
-                duration: 3,
-                distance: 90,
-                customerStatus: "Not Terminated",
-                customers: [
-                    { name: "Alice Green", address: "101 Maple St", contact: "555-222-3333", status: "Planned" },
-                ],
-            },
-        ];
-
-        // Load Routes into the Table
-        function loadRoutes() {
-            const table = document.getElementById("routeTable");
-            table.innerHTML = ""; // Clear table
-
-            routes.forEach(route => {
-                const row = document.createElement("tr");
-                row.className = "border-b border-gray-700 hover:bg-gray-700 transition";
-
-                row.innerHTML = `
-                    <td class="px-4 py-3">
-                        <span class="w-4 h-4 inline-block rounded-full" style="background-color: ${route.status};"></span>
-                    </td>
-                    <td class="px-4 py-3">${route.name}</td>
-                    <td class="px-4 py-3">${route.plannedDate}</td>
-                    <td class="px-4 py-3">${route.duration}</td>
-                    <td class="px-4 py-3">${route.distance}</td>
-                    <td class="px-4 py-3">${route.customerStatus}</td>
-                    <td class="px-4 py-3">
-                        <button class="bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-500 transition" onclick="openModal(${route.id})">
-                            Start
-                        </button>
-                    </td>
-                `;
-                table.appendChild(row);
-            });
-        }
-
-        // Open Modal for Route Details
-        function openModal(routeId) {
-            const route = routes.find(r => r.id === routeId);
-            if (!route) return;
-
-            // Update Modal Content
-            document.getElementById("modalRouteName").textContent = route.name;
-            const customerTable = document.getElementById("customerTable");
-            customerTable.innerHTML = ""; // Clear table
-
-            route.customers.forEach(customer => {
-                const row = document.createElement("tr");
-                row.className = "border-b border-gray-600 hover:bg-gray-600 transition";
-
-                row.innerHTML = `
-                    <td class="px-4 py-3">${customer.name}</td>
-                    <td class="px-4 py-3">${customer.address}</td>
-                    <td class="px-4 py-3">${customer.contact}</td>
-                    <td class="px-4 py-3">${customer.status}</td>
-                    <td class="px-4 py-3">
-                        <button class="bg-green-600 px-4 py-2 rounded-lg hover:bg-green-500 transition" onclick="markDone('${customer.name}', ${routeId})">
-                            Mark Done
-                        </button>
-                    </td>
-                `;
-                customerTable.appendChild(row);
-            });
-
-            // Show Modal
-            document.getElementById("routeModal").classList.remove("hidden");
-        }
-
-        // Mark Customer as Done
-        function markDone(customerName, routeId) {
-            const route = routes.find(r => r.id === routeId);
-            if (!route) return;
-
-            const customer = route.customers.find(c => c.name === customerName);
-            if (customer) {
-                customer.status = "Done";
-                openModal(routeId); // Refresh modal
-            }
-        }
-
-        // Close Modal
-        function closeModal() {
-            document.getElementById("routeModal").classList.add("hidden");
-        }
-
-        // Initialize
-        document.addEventListener("DOMContentLoaded", loadRoutes);
-    </script>
 </body>
 </html>
