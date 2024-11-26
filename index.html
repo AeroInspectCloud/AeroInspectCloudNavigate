@@ -3,115 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SharePoint Document Library</title>
+    <title>Modern Document Library</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://alcdn.msauth.net/browser/2.36.0/js/msal-browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
-    <header class="bg-blue-600 text-white py-4">
+<body class="bg-gray-900 text-gray-100">
+    <!-- Header -->
+    <header class="bg-gray-800 py-6 shadow-lg">
         <div class="container mx-auto flex justify-between items-center px-6">
-            <h1 class="text-2xl font-bold">Document Library</h1>
-            <button id="loginBtn" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100">
-                Login
-            </button>
-            <button id="logoutBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 hidden">
-                Logout
-            </button>
+            <h1 class="text-3xl font-bold tracking-wide">Document Library</h1>
+            <div>
+                <button id="loginBtn" class="bg-gray-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-600 transition">
+                    Login
+                </button>
+                <button id="logoutBtn" class="bg-red-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-600 transition hidden">
+                    Logout
+                </button>
+            </div>
         </div>
     </header>
 
-    <main class="container mx-auto p-6">
-        <section id="status" class="text-center mb-6"></section>
-        <table id="documentsTable" class="table-auto w-full bg-white shadow-lg rounded-lg overflow-hidden hidden">
+    <!-- Main Section -->
+    <main class="container mx-auto px-6 py-8">
+        <!-- Status Message -->
+        <div id="status" class="text-center text-gray-400 text-lg mb-8">Please login to view the documents.</div>
+
+        <!-- Breadcrumb Navigation -->
+        <nav id="breadcrumb" class="flex items-center space-x-4 mb-6 text-gray-300 hidden">
+            <span class="text-gray-500">You are here:</span>
+            <div id="breadcrumb-links" class="flex space-x-2"></div>
+        </nav>
+
+        <!-- Document Table -->
+        <table id="documentsTable" class="table-auto w-full bg-gray-800 shadow-lg rounded-lg hidden">
             <thead>
-                <tr class="bg-blue-600 text-white">
-                    <th class="px-4 py-2">File Name</th>
-                    <th class="px-4 py-2">Modified By</th>
-                    <th class="px-4 py-2">Last Modified</th>
-                    <th class="px-4 py-2">Size</th>
+                <tr class="bg-gray-700 text-gray-100">
+                    <th class="px-4 py-3 text-left">Name</th>
+                    <th class="px-4 py-3 text-left">Type</th>
+                    <th class="px-4 py-3 text-left">Modified By</th>
+                    <th class="px-4 py-3 text-left">Last Modified</th>
                 </tr>
             </thead>
-            <tbody class="text-center"></tbody>
+            <tbody class="text-gray-300"></tbody>
         </table>
     </main>
 
     <script>
-        const msalConfig = {
-            auth: {
-                clientId: "YOUR_CLIENT_ID", // Replace with your Azure App Client ID
-                authority: "https://login.microsoftonline.com/YOUR_TENANT_ID", // Replace with your Tenant ID
-                redirectUri: window.location.origin
-            }
-        };
+        // Mock Data for Testing
+        const mockData = [
+            {
+                name: "Folder 1",
+                type: "folder",
+                children: [
+                    { name: "Document1.pdf", type: "file", modifiedBy: "John Doe", modifiedDate: new Date().toISOString() },
+                    { name: "Document2.docx", type: "file", modifiedBy: "Jane Smith", modifiedDate: new Date().toISOString() },
+                ],
+            },
+            {
+                name: "Folder 2",
+                type: "folder",
+                children: [
+                    { name: "Spreadsheet.xlsx", type: "file", modifiedBy: "Emily Johnson", modifiedDate: new Date().toISOString() },
+                ],
+            },
+            {
+                name: "Presentation.pptx",
+                type: "file",
+                modifiedBy: "Michael Brown",
+                modifiedDate: new Date().toISOString(),
+            },
+        ];
 
-        const msalInstance = new msal.PublicClientApplication(msalConfig);
-        const loginRequest = { scopes: ["Sites.Read.All"] };
+        let currentFolder = mockData; // Track the current folder contents
+        const breadcrumb = []; // Track navigation path
 
-        const siteId = "YOUR_SITE_ID"; // Replace with your SharePoint Site ID
-        const documentLibraryId = "YOUR_LIBRARY_ID"; // Replace with your SharePoint Document Library ID
-
-        document.getElementById("loginBtn").addEventListener("click", () => {
-            msalInstance.loginPopup(loginRequest)
-                .then((loginResponse) => {
-                    document.getElementById("status").innerText = `Logged in as: ${loginResponse.account.username}`;
-                    document.getElementById("loginBtn").classList.add("hidden");
-                    document.getElementById("logoutBtn").classList.remove("hidden");
-                    fetchDocuments();
-                })
-                .catch((error) => console.error("Login failed:", error));
-        });
-
-        document.getElementById("logoutBtn").addEventListener("click", () => {
-            msalInstance.logoutPopup()
-                .then(() => {
-                    document.getElementById("status").innerText = "Logged out.";
-                    document.getElementById("loginBtn").classList.remove("hidden");
-                    document.getElementById("logoutBtn").classList.add("hidden");
-                    document.getElementById("documentsTable").classList.add("hidden");
-                });
-        });
-
-        function fetchDocuments() {
-            msalInstance.acquireTokenSilent(loginRequest)
-                .then((tokenResponse) => {
-                    const accessToken = tokenResponse.accessToken;
-                    fetch(`https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${documentLibraryId}/root/children`, {
-                        headers: { Authorization: `Bearer ${accessToken}` }
-                    })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            displayDocuments(data.value);
-                        })
-                        .catch((error) => console.error("Error fetching documents:", error));
-                })
-                .catch((error) => {
-                    console.error("Token acquisition failed:", error);
-                    msalInstance.acquireTokenPopup(loginRequest);
-                });
+        function updateBreadcrumb() {
+            const breadcrumbLinks = document.getElementById("breadcrumb-links");
+            breadcrumbLinks.innerHTML = "";
+            breadcrumb.forEach((crumb, index) => {
+                const link = document.createElement("button");
+                link.className = "text-blue-400 hover:underline";
+                link.textContent = crumb.name;
+                link.onclick = () => navigateTo(index);
+                breadcrumbLinks.appendChild(link);
+                if (index < breadcrumb.length - 1) {
+                    const separator = document.createElement("span");
+                    separator.textContent = " / ";
+                    breadcrumbLinks.appendChild(separator);
+                }
+            });
         }
 
-        function displayDocuments(documents) {
+        function navigateTo(index) {
+            if (index < 0) {
+                currentFolder = mockData;
+                breadcrumb.length = 0;
+            } else {
+                currentFolder = breadcrumb[index].children;
+                breadcrumb.length = index + 1;
+            }
+            displayDocuments();
+        }
+
+        function displayDocuments() {
             const table = document.getElementById("documentsTable");
             const tbody = table.querySelector("tbody");
-            tbody.innerHTML = "";
+            const breadcrumbNav = document.getElementById("breadcrumb");
 
-            documents.forEach((doc) => {
+            tbody.innerHTML = ""; // Clear previous data
+            breadcrumbNav.classList.remove("hidden");
+            table.classList.remove("hidden");
+
+            updateBreadcrumb();
+
+            currentFolder.forEach((item) => {
                 const row = document.createElement("tr");
-                row.className = "border-b border-gray-200";
+                row.className = "border-b border-gray-700 hover:bg-gray-700 transition";
 
-                row.innerHTML = `
-                    <td class="px-4 py-2 text-left text-blue-600 hover:underline">
-                        <a href="${doc.webUrl}" target="_blank">${doc.name}</a>
-                    </td>
-                    <td class="px-4 py-2">${doc.lastModifiedBy?.user?.displayName || "Unknown"}</td>
-                    <td class="px-4 py-2">${new Date(doc.lastModifiedDateTime).toLocaleDateString()}</td>
-                    <td class="px-4 py-2">${(doc.size / 1024).toFixed(2)} KB</td>
-                `;
+                if (item.type === "folder") {
+                    row.innerHTML = `
+                        <td class="px-4 py-3">
+                            <button class="text-blue-400 hover:underline" onclick="openFolder('${item.name}')">${item.name}</button>
+                        </td>
+                        <td class="px-4 py-3">Folder</td>
+                        <td class="px-4 py-3">-</td>
+                        <td class="px-4 py-3">-</td>
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <td class="px-4 py-3">
+                            <a href="#" class="text-blue-400 hover:underline">${item.name}</a>
+                        </td>
+                        <td class="px-4 py-3">File</td>
+                        <td class="px-4 py-3">${item.modifiedBy || "Unknown"}</td>
+                        <td class="px-4 py-3">${new Date(item.modifiedDate).toLocaleDateString()}</td>
+                    `;
+                }
                 tbody.appendChild(row);
             });
-
-            table.classList.remove("hidden");
         }
+
+        function openFolder(folderName) {
+            const folder = currentFolder.find((item) => item.name === folderName && item.type === "folder");
+            if (folder) {
+                breadcrumb.push(folder);
+                currentFolder = folder.children;
+                displayDocuments();
+            }
+        }
+
+        // Populate mock data on load for testing
+        document.addEventListener("DOMContentLoaded", () => {
+            navigateTo(-1); // Load root directory
+        });
     </script>
 </body>
 </html>
