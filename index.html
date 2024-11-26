@@ -3,82 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Stacked Layout</title>
+    <title>Catalyst Style Page</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-900 text-gray-100 font-sans">
-    <!-- Header -->
-    <header class="bg-gray-800 shadow-md py-6">
-        <div class="container mx-auto flex justify-between items-center px-6">
-            <h1 class="text-3xl font-extrabold">Stacked Layout</h1>
-            <button class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-sm font-medium transition">
-                Add Item
-            </button>
+    <!-- Sidebar -->
+    <div class="flex h-screen">
+        <!-- Navigation -->
+        <nav class="w-64 bg-gray-800 flex flex-col p-6 space-y-6">
+            <h1 class="text-2xl font-bold text-white mb-4">My Dashboard</h1>
+            <ul class="flex flex-col space-y-3">
+                <li>
+                    <a href="#overview" class="flex items-center px-4 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white transition">
+                        Overview
+                    </a>
+                </li>
+                <li>
+                    <a href="#projects" class="flex items-center px-4 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white transition">
+                        Projects
+                    </a>
+                </li>
+                <li>
+                    <a href="#tasks" class="flex items-center px-4 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white transition">
+                        Tasks
+                    </a>
+                </li>
+                <li>
+                    <a href="#settings" class="flex items-center px-4 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white transition">
+                        Settings
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Content -->
+        <div class="flex-1 overflow-y-auto">
+            <!-- Header -->
+            <header class="bg-gray-800 shadow-md py-4 px-6 flex justify-between items-center">
+                <h2 class="text-lg font-bold">Welcome to Your Dashboard</h2>
+                <button class="bg-blue-600 px-4 py-2 text-sm font-medium rounded-lg hover:bg-blue-500 transition">
+                    Add New
+                </button>
+            </header>
+
+            <!-- Main Content -->
+            <main class="p-6 space-y-8">
+                <!-- Section 1: Overview -->
+                <section id="overview" class="bg-gray-800 rounded-lg shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4">Overview</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Card 1 -->
+                        <div class="bg-gray-700 rounded-lg p-4 shadow">
+                            <p class="text-2xl font-bold text-white">120</p>
+                            <p class="text-gray-400">Total Projects</p>
+                        </div>
+                        <!-- Card 2 -->
+                        <div class="bg-gray-700 rounded-lg p-4 shadow">
+                            <p class="text-2xl font-bold text-white">45</p>
+                            <p class="text-gray-400">Tasks Completed</p>
+                        </div>
+                        <!-- Card 3 -->
+                        <div class="bg-gray-700 rounded-lg p-4 shadow">
+                            <p class="text-2xl font-bold text-white">8</p>
+                            <p class="text-gray-400">Pending Tasks</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Projects -->
+                <section id="projects" class="bg-gray-800 rounded-lg shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4">Projects</h3>
+                    <ul class="space-y-3">
+                        <li class="bg-gray-700 rounded-lg p-4 shadow hover:bg-gray-600 transition">
+                            <p class="font-medium text-white">Project A</p>
+                            <p class="text-sm text-gray-400">Description of Project A</p>
+                        </li>
+                        <li class="bg-gray-700 rounded-lg p-4 shadow hover:bg-gray-600 transition">
+                            <p class="font-medium text-white">Project B</p>
+                            <p class="text-sm text-gray-400">Description of Project B</p>
+                        </li>
+                        <li class="bg-gray-700 rounded-lg p-4 shadow hover:bg-gray-600 transition">
+                            <p class="font-medium text-white">Project C</p>
+                            <p class="text-sm text-gray-400">Description of Project C</p>
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Section 3: Tasks -->
+                <section id="tasks" class="bg-gray-800 rounded-lg shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4">Tasks</h3>
+                    <table class="w-full bg-gray-700 rounded-lg overflow-hidden">
+                        <thead class="bg-gray-600">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-gray-300">Task</th>
+                                <th class="px-4 py-2 text-left text-gray-300">Status</th>
+                                <th class="px-4 py-2 text-left text-gray-300">Deadline</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="hover:bg-gray-600 transition">
+                                <td class="px-4 py-2 text-gray-100">Task 1</td>
+                                <td class="px-4 py-2 text-green-500">Completed</td>
+                                <td class="px-4 py-2 text-gray-300">2024-12-01</td>
+                            </tr>
+                            <tr class="hover:bg-gray-600 transition">
+                                <td class="px-4 py-2 text-gray-100">Task 2</td>
+                                <td class="px-4 py-2 text-yellow-500">In Progress</td>
+                                <td class="px-4 py-2 text-gray-300">2024-12-05</td>
+                            </tr>
+                            <tr class="hover:bg-gray-600 transition">
+                                <td class="px-4 py-2 text-gray-100">Task 3</td>
+                                <td class="px-4 py-2 text-red-500">Delayed</td>
+                                <td class="px-4 py-2 text-gray-300">2024-12-10</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Section 4: Settings -->
+                <section id="settings" class="bg-gray-800 rounded-lg shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4">Settings</h3>
+                    <p class="text-gray-400">This section can contain user preferences, API settings, or other options.</p>
+                </section>
+            </main>
         </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="container mx-auto px-6 py-8 space-y-8">
-        <!-- Section 1: Overview Card -->
-        <section class="bg-gray-800 rounded-lg shadow-lg p-6">
-            <h2 class="text-xl font-semibold mb-4">Overview</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Card 1 -->
-                <div class="bg-gray-700 rounded-lg p-4 flex flex-col items-center justify-center shadow-md">
-                    <p class="text-2xl font-bold">120</p>
-                    <p class="text-gray-400">Total Routes</p>
-                </div>
-                <!-- Card 2 -->
-                <div class="bg-gray-700 rounded-lg p-4 flex flex-col items-center justify-center shadow-md">
-                    <p class="text-2xl font-bold">75%</p>
-                    <p class="text-gray-400">Completed</p>
-                </div>
-                <!-- Card 3 -->
-                <div class="bg-gray-700 rounded-lg p-4 flex flex-col items-center justify-center shadow-md">
-                    <p class="text-2xl font-bold">30</p>
-                    <p class="text-gray-400">Pending</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 2: Route List -->
-        <section class="bg-gray-800 rounded-lg shadow-lg p-6">
-            <h2 class="text-xl font-semibold mb-4">Planned Routes</h2>
-            <div class="space-y-4">
-                <!-- Route Item 1 -->
-                <div class="bg-gray-700 rounded-lg p-4 flex justify-between items-center shadow-md hover:bg-gray-600 transition">
-                    <div>
-                        <p class="font-medium text-gray-100">Route A</p>
-                        <p class="text-sm text-gray-400">Planned Date: 2024-12-01</p>
-                    </div>
-                    <span class="bg-green-500 text-sm px-3 py-1 rounded-full">Active</span>
-                </div>
-                <!-- Route Item 2 -->
-                <div class="bg-gray-700 rounded-lg p-4 flex justify-between items-center shadow-md hover:bg-gray-600 transition">
-                    <div>
-                        <p class="font-medium text-gray-100">Route B</p>
-                        <p class="text-sm text-gray-400">Planned Date: 2024-12-02</p>
-                    </div>
-                    <span class="bg-yellow-500 text-sm px-3 py-1 rounded-full">Pending</span>
-                </div>
-                <!-- Route Item 3 -->
-                <div class="bg-gray-700 rounded-lg p-4 flex justify-between items-center shadow-md hover:bg-gray-600 transition">
-                    <div>
-                        <p class="font-medium text-gray-100">Route C</p>
-                        <p class="text-sm text-gray-400">Planned Date: 2024-12-03</p>
-                    </div>
-                    <span class="bg-red-500 text-sm px-3 py-1 rounded-full">Delayed</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 3: Map Integration -->
-        <section class="bg-gray-800 rounded-lg shadow-lg p-6">
-            <h2 class="text-xl font-semibold mb-4">Map</h2>
-            <div class="aspect-w-16 aspect-h-9 bg-gray-700 rounded-lg flex items-center justify-center text-gray-400">
-                <p>Map Placeholder (e.g., Google Maps API)</p>
-            </div>
-        </section>
-    </main>
+    </div>
 </body>
 </html>
